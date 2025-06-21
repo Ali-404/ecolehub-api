@@ -1,6 +1,7 @@
 import Roles from "../../enums/roles.enum";
-import { BeforeInsert, BeforeUpdate, Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { BeforeInsert, BeforeUpdate, Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import * as bcrypt from 'bcrypt';
+import { RefreshToken } from "./refresh-token.entity";
 
 
 @Entity()
@@ -50,4 +51,7 @@ export class User {
         const salt = await bcrypt.genSalt();
         this.password = await bcrypt.hash(this.password, salt);
     }
+
+    @OneToMany(() => RefreshToken, rt => rt.user)
+    refreshTokens: RefreshToken[];
 }
