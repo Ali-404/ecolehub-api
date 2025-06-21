@@ -16,7 +16,6 @@ import { User } from './auth/entities/user.entity';
       entities: [User],
       autoLoadEntities: true,
       synchronize: true,
-      
 
     }),
     AuthModule,

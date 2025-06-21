@@ -1,4 +1,4 @@
-import Roles from "src/enums/Roles.enum";
+import Roles from "../../enums/roles.enum";
 import { BeforeInsert, BeforeUpdate, Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import * as bcrypt from 'bcrypt';
 
@@ -39,7 +39,8 @@ export class User {
     @UpdateDateColumn()
     updatedAt: Date;
 
-    
+    @Column({nullable: true})
+    address: string;
 
 
     @BeforeInsert()

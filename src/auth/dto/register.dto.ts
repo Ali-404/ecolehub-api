@@ -1,5 +1,5 @@
-import { IsDate, IsDateString, IsEmail, IsEnum, IsMobilePhone, IsOptional, IsString, IsStrongPassword, MinLength } from "class-validator";
-import Roles from "src/enums/Roles.enum";
+import {  IsDateString, IsEmail, IsEnum, IsMobilePhone, IsOptional, IsString, IsStrongPassword, MinLength } from "class-validator";
+import Roles from "../../enums/roles.enum";
 
 
 export class RegisterDTO{
@@ -28,6 +28,10 @@ export class RegisterDTO{
 
     @IsString()
     first_name: string;
+
+    @IsOptional()
+    @IsString()
+    address: string;
 
     @IsString()
     last_name: string;
