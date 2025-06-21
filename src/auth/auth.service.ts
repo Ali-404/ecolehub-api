@@ -7,6 +7,7 @@ import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import bcrypt from 'bcrypt'
 import { RegisterDTO } from './dto/register.dto';
+import JwtPayload from './types/jwt.type';
 
 @Injectable()
 export class AuthService {
@@ -25,8 +26,14 @@ export class AuthService {
     return null;
   }
 
+  async getUsers(): Promise<User[]> {
+    return this.userRepo.find({
+      select: ['id', 'email', 'first_name', 'last_name', 'createdAt', 'updatedAt', 'role', "CIN", "phone_number"],
+    });
+  }
+
   async login(user: {email:string, id: number}) {
-    const payload = { email: user.email, sub: user.id };
+    const payload:JwtPayload = { email: user.email, sub: user.id };
     return {
       access_token: this.jwtService.sign(payload),
     };
