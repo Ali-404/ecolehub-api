@@ -1,20 +1,54 @@
-import { Controller, Post } from '@nestjs/common';
+import { BadRequestException, Controller, Get, Param, Post, Request, UseGuards, ParseIntPipe } from '@nestjs/common';
 import { UserService } from './user.service';
+import { InjectRepository } from '@nestjs/typeorm';
+import { User } from 'src/auth/entities/user.entity';
+import { Repository } from 'typeorm';
+import Roles from 'src/enums/roles.enum';
+import { AuthGuard } from '@nestjs/passport';
 
-@Controller('user')
+@Controller('users')
 export class UserController {
 
 
-    constructor(private readonly userService: UserService) { }
+    constructor(private readonly userService: UserService, @InjectRepository(User) private readonly userRepository:Repository<User>) {}
 
-    // add admin role to user
-    @Post('add-admin-role')
-    addAdminRole() {
-        // Logic to add admin role to user
-        // This could involve updating the user's role in the database
-        return { message: 'Admin role added successfully' };
+    // add role to user
+    @UseGuards(AuthGuard('jwt'))
+    @Post('add_role/:id/:role')
+    async addRole(@Param('id', ParseIntPipe) id: number, @Param('role') role: Roles) {
+        const user = await this.userRepository.findOne({ where: { id } });
+        if (!user) throw new BadRequestException('Utilisateur non trouvé !');
+        switch (role) {
+            case Roles.ADMIN:
+                return this.userService.addAdminRole(user);
+            case Roles.PROF:
+                return this.userService.addProfRole(user);
+            case Roles.STUDENT:
+                return this.userService.addStudentRole(user);
+            case Roles.GESTIONNAIRE:
+                return this.userService.addGestionnaireRole(user);
+            default:
+                throw new BadRequestException('Rôle non valide !');
+        }
     }
     // add prof role to prof
     // add student role to student
+    @UseGuards(AuthGuard('jwt'))
+    @Get('with_role/:id')
+    async getUserWithRole(@Param('id', ParseIntPipe) id: number) {
+        const user = await this.userService.getUserWithRole(id);
+        if (!user) throw new BadRequestException('Utilisateur non trouvé !');
+        return user;
+    }
+
+    @UseGuards(AuthGuard('jwt'))
+    @Get('user')
+    async getMe(@Request() req) {
+        const userId = req.user?.userId;
+        if (!userId) throw new BadRequestException('Utilisateur non authentifié !');
+        const user = await this.userService.getUserWithRole(userId);
+        if (!user) throw new BadRequestException('Utilisateur non trouvé !');
+        return user;
+    }
 
 }
