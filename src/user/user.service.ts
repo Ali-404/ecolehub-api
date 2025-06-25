@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/auth/entities/user.entity';
 import Roles from 'src/enums/roles.enum';
@@ -62,6 +62,24 @@ export class UserService {
             relations: ['admin', 'prof', 'student', 'gestionnaire']
         });
         return user;
+    }
+
+
+
+    public async deleteUser(id: number){
+        if (!id) throw new BadRequestException('ID utilisateur manquant !');
+        const user = await this.userRepository.findOne({ where: { id } });
+        if (!user) throw new BadRequestException('Utilisateur non trouvé !');
+        await this.userRepository.softDelete(id);
+        return { message: 'Utilisateur supprimé avec succès !' };
+    }
+
+    public async restoreUser(id: number){
+        if (!id) throw new BadRequestException('ID utilisateur manquant !');
+        const user = await this.userRepository.findOne({ where: { id }, withDeleted: true });
+        if (!user) throw new BadRequestException('Utilisateur non trouvé !');
+        await this.userRepository.restore(id);
+        return { message: 'Utilisateur restauré avec succès !' };
     }
 
 }

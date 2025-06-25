@@ -31,8 +31,7 @@ export class UserController {
                 throw new BadRequestException('Rôle non valide !');
         }
     }
-    // add prof role to prof
-    // add student role to student
+
     @UseGuards(AuthGuard('jwt'))
     @Get('with_role/:id')
     async getUserWithRole(@Param('id', ParseIntPipe) id: number) {
@@ -49,6 +48,13 @@ export class UserController {
         const user = await this.userService.getUserWithRole(userId);
         if (!user) throw new BadRequestException('Utilisateur non trouvé !');
         return user;
+    }
+
+
+    @UseGuards(AuthGuard('jwt'))
+    @Post('delete/:id')
+    async deleteUser(@Param('id', ParseIntPipe) id: number) {
+        return this.userService.deleteUser(id);
     }
 
 }
